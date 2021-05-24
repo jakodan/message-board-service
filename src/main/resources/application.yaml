@@ -1,0 +1,1 @@
+messages-base-url: ${MESSAGES_BASE_URL:http://localhost:8080/messages}

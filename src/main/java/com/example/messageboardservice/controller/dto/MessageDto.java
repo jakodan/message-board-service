@@ -3,7 +3,8 @@ package com.example.messageboardservice.controller.dto;
 import lombok.Value;
 
 @Value
-public class Messages {
+public class MessageDto {
 
-  String id;
+  String text;
+
 }

@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
@@ -34,5 +35,21 @@ class RestMessageControllerTest {
     var result = this.restTemplate.exchange(messagesBaseUrl, HttpMethod.GET, HttpEntity.EMPTY, String.class);
 
     assertThat(result.getStatusCode()).isEqualByComparingTo(HttpStatus.NOT_IMPLEMENTED);
+  }
+
+  @Test
+  void postMessageShouldReturnCreatedStatus() {
+    var result = this.restTemplate.exchange(messagesBaseUrl, HttpMethod.POST, HttpEntity.EMPTY, String.class);
+
+    assertThat(result.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);
+  }
+
+  @Test
+  void postMessageShouldReturnLocationHeader() {
+    var result = this.restTemplate.exchange(messagesBaseUrl, HttpMethod.POST, HttpEntity.EMPTY, String.class);
+    var locationHeaders = result.getHeaders().get(HttpHeaders.LOCATION);
+
+    assertThat(locationHeaders).hasSize(1);
+    assertThat(locationHeaders.get(0)).matches("^http://localhost:8080/messages/[0-9]{1,10}$");
   }
 }
