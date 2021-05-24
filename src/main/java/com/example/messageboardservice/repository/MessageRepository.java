@@ -9,9 +9,7 @@ public interface MessageRepository {
 
   Collection<Message> getAll();
 
-  Collection<Message> getMessagesAfter(String messageId, int maxResults);
-
-  Collection<Message> getMessagesBefore(String messageId, int maxResults);
-
   void deleteMessage(String messageId);
+
+  void updateMessageText(String messageId, String newText);
 }

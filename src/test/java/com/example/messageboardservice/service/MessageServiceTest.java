@@ -63,4 +63,14 @@ class MessageServiceTest {
 
     verify(messageRepository).deleteMessage(messageId);
   }
+
+  @Test
+  void shouldUpdateMessage() {
+    var messageId = "123";
+    var newText = "new text";
+
+    messageService.updateMessage(messageId, newText);
+
+    verify(messageRepository).updateMessageText(messageId, newText);
+  }
 }

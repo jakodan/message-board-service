@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.example.messageboardservice.controller.dto.MessageDto;
 import com.example.messageboardservice.controller.dto.MessageDtoCollection;
 import com.example.messageboardservice.controller.dto.NewMessage;
+import com.example.messageboardservice.controller.dto.UpdatedMessage;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -17,6 +18,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -95,12 +97,41 @@ class RestMessageControllerTest {
     assertThat(getAllMessages().getBody().getMessages()).isEmpty();
   }
 
+  @Test
+  void shouldUpdateMessage() {
+    var newMessage = new NewMessage("this is a message");
+    var createdMessage = postMessage(newMessage);
+
+    var updatedMessage = new UpdatedMessage(createdMessage.getBody().getText() + " updated");
+
+    updateMessage(createdMessage.getBody().getId(), updatedMessage);
+
+    assertThat(getAllMessages().getBody().getMessages().get(0).getText()).isEqualTo(updatedMessage.getText());
+  }
+
+  @Test
+  void shouldReturn404_whenUpdatingNonExistingMessage() {
+    var updatedMessage = new UpdatedMessage("updated text");
+    var requestBody = new HttpEntity<>(updatedMessage);
+
+    var response = restTemplate.exchange(messagesBaseUrl + "/1337", HttpMethod.PUT, requestBody, String.class);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+  }
+
+  @Test
+  void shouldReturn404_whenDeletingNonExistingMessage() {
+    var response = restTemplate.exchange(messagesBaseUrl + "/1337", HttpMethod.DELETE, HttpEntity.EMPTY, String.class);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+  }
+
   private ResponseEntity<MessageDtoCollection> getAllMessages() {
     return restTemplate.getForEntity(messagesBaseUrl, MessageDtoCollection.class);
   }
 
   private ResponseEntity<MessageDto> postMessage(NewMessage newMessage) {
-    HttpEntity<NewMessage> request = new HttpEntity<>(newMessage);
+    var request = new HttpEntity<>(newMessage);
     var response = restTemplate.postForEntity(messagesBaseUrl, request, MessageDto.class);
 
     if (response.getBody() != null) {
@@ -115,5 +146,10 @@ class RestMessageControllerTest {
 
   private void deleteMessage(String messageId) {
     restTemplate.delete(messagesBaseUrl + "/" + messageId);
+  }
+
+  private void updateMessage(String messageId, UpdatedMessage updatedMessage) {
+    var request = new HttpEntity<>(updatedMessage);
+    restTemplate.put(messagesBaseUrl + "/" + messageId, request);
   }
 }

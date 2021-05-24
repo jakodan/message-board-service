@@ -1,5 +1,6 @@
 package com.example.messageboardservice.repository;
 
+import com.example.messageboardservice.service.exception.MessageNotFoundException;
 import com.example.messageboardservice.service.model.Message;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,17 +26,24 @@ public class InMemoryMessageRepository implements MessageRepository {
   }
 
   @Override
-  public Collection<Message> getMessagesAfter(String messageId, int maxResults) {
-    throw new AssertionError("Not implemented");
-  }
-
-  @Override
-  public Collection<Message> getMessagesBefore(String messageId, int maxResults) {
-    throw new AssertionError("Not implemented");
-  }
-
-  @Override
   public void deleteMessage(String messageId) {
-    messageMap.remove(messageId);
+    var removedMessage = messageMap.remove(messageId);
+
+    if (removedMessage == null) {
+      throw new MessageNotFoundException(messageId);
+    }
+  }
+
+  @Override
+  public void updateMessageText(String messageId, String newText) {
+    var message = messageMap.get(messageId);
+
+    if (message == null) {
+      throw new MessageNotFoundException(messageId);
+    }
+
+    var updatedMessage = message.withText(newText);
+
+    messageMap.put(messageId, updatedMessage);
   }
 }

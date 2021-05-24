@@ -28,4 +28,8 @@ public class MessageService {
   public void deleteMessage(String messageId) {
     messageRepository.deleteMessage(messageId);
   }
+
+  public void updateMessage(String messageId, String newText) {
+    messageRepository.updateMessageText(messageId, newText);
+  }
 }
