@@ -2,15 +2,17 @@ package com.example.messageboardservice.repository;
 
 import com.example.messageboardservice.service.model.Message;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class InMemoryMessageRepository implements MessageRepository {
 
   private final Map<String, Message> messageMap;
 
-  public InMemoryMessageRepository(Map<String, Message> messageMap) {
-    this.messageMap = messageMap;
+  public InMemoryMessageRepository() {
+    this.messageMap = Collections.synchronizedMap(new LinkedHashMap<>());
   }
 
   @Override
@@ -19,17 +21,17 @@ public class InMemoryMessageRepository implements MessageRepository {
   }
 
   @Override
-  public List<Message> getAll() {
+  public Collection<Message> getAll() {
     return new ArrayList<>(messageMap.values());
   }
 
   @Override
-  public List<Message> getMessagesAfter(String messageId, int maxResults) {
+  public Collection<Message> getMessagesAfter(String messageId, int maxResults) {
     throw new AssertionError("Not implemented");
   }
 
   @Override
-  public List<Message> getMessagesBefore(String messageId, int maxResults) {
+  public Collection<Message> getMessagesBefore(String messageId, int maxResults) {
     throw new AssertionError("Not implemented");
   }
 }

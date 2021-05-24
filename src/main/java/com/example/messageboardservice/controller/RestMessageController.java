@@ -5,6 +5,7 @@ import com.example.messageboardservice.controller.dto.MessageDtoCollection;
 import com.example.messageboardservice.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +17,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @Slf4j
-@RequestMapping("/messages")
+@RequestMapping(
+    path = "/messages",
+    produces = MediaType.APPLICATION_JSON_VALUE)
 public class RestMessageController {
 
   private final MessageURICreator messageURICreator;
@@ -29,13 +32,17 @@ public class RestMessageController {
 
   @GetMapping
   public ResponseEntity<MessageDtoCollection> getMessages() {
-    throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED);
+    var messages = messageService.getAllMessages();
+    var messageCollection = MessageDtoCollection.createFrom(messages);
+
+    return ResponseEntity.ok(messageCollection);
   }
 
   @PostMapping
   public ResponseEntity<MessageDto> postMessage(MessageDto messageDto) {
     var messageId = messageService.createMessage(messageDto.getText());
     var messageUri = messageURICreator.create(messageId);
+
     return ResponseEntity.created(messageUri).build();
   }
 

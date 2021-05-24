@@ -2,6 +2,9 @@ package com.example.messageboardservice.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.example.messageboardservice.controller.dto.MessageDtoCollection;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,9 @@ class RestMessageControllerTest {
 
   @Autowired
   private TestRestTemplate restTemplate;
+
+  @Autowired
+  private ObjectMapper objectMapper;
 
   private String messagesBaseUrl;
 
@@ -51,5 +57,15 @@ class RestMessageControllerTest {
 
     assertThat(locationHeaders).hasSize(1);
     assertThat(locationHeaders.get(0)).matches("^http://localhost:8080/messages/[0-9]{1,10}$");
+  }
+
+  @Test
+  @SneakyThrows
+  void shouldGetEmptyListWhenNoMessages() {
+    var result = this.restTemplate.exchange(messagesBaseUrl, HttpMethod.GET, HttpEntity.EMPTY, String.class);
+
+    var messageDtoCollection = objectMapper.readValue(result.getBody(), MessageDtoCollection.class);
+
+    assertThat(messageDtoCollection.getMessages()).isEmpty();
   }
 }
