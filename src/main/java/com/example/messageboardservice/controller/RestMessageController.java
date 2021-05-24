@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -52,13 +53,13 @@ public class RestMessageController {
 
   @PutMapping("/{message-id")
   public ResponseEntity<String> updateMesage() {
-
     throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED);
   }
 
-  @DeleteMapping("/message-id")
-  public ResponseEntity<String> deleteMessage() {
-    throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED);
+  @DeleteMapping("/{message-id}")
+  public ResponseEntity<Void> deleteMessage(@PathVariable("message-id") String messageId) {
+    messageService.deleteMessage(messageId);
+    return ResponseEntity.ok().build();
   }
 
 }

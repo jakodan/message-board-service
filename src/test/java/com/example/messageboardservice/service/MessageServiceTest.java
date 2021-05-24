@@ -54,4 +54,13 @@ class MessageServiceTest {
 
     assertThat(messages).containsExactly(message);
   }
+
+  @Test
+  void shouldDeleteMessage() {
+    var messageId = "123";
+
+    messageService.deleteMessage(messageId);
+
+    verify(messageRepository).deleteMessage(messageId);
+  }
 }

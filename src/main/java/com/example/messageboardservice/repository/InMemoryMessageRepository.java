@@ -33,4 +33,9 @@ public class InMemoryMessageRepository implements MessageRepository {
   public Collection<Message> getMessagesBefore(String messageId, int maxResults) {
     throw new AssertionError("Not implemented");
   }
+
+  @Override
+  public void deleteMessage(String messageId) {
+    messageMap.remove(messageId);
+  }
 }

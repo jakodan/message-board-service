@@ -7,7 +7,6 @@ import com.example.messageboardservice.controller.dto.MessageDtoCollection;
 import com.example.messageboardservice.controller.dto.NewMessage;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,7 +42,7 @@ class RestMessageControllerTest {
   @AfterEach
   void cleanup() {
     for (var id : createdMessageIds) {
-      //delete message
+      deleteMessage(id);
     }
   }
 
@@ -68,7 +67,6 @@ class RestMessageControllerTest {
   }
 
   @Test
-  @SneakyThrows
   void shouldGetEmptyListWhenNoMessages() {
     var messageDtoCollection = getAllMessages().getBody();
 
@@ -76,7 +74,6 @@ class RestMessageControllerTest {
   }
 
   @Test
-  @SneakyThrows
   void shouldGetMessageAfterCreating() {
     var messageToCreate = new NewMessage("this is a message");
     postMessage(messageToCreate);
@@ -88,11 +85,20 @@ class RestMessageControllerTest {
     assertThat(firstMessage.getText()).isEqualTo(messageToCreate.getText());
   }
 
+  @Test
+  void shouldDeleteMessage() {
+    var message = new NewMessage("this is a message");
+    var createdMessage = postMessage(message);
+
+    deleteMessage(createdMessage.getBody().getId());
+
+    assertThat(getAllMessages().getBody().getMessages()).isEmpty();
+  }
+
   private ResponseEntity<MessageDtoCollection> getAllMessages() {
     return restTemplate.getForEntity(messagesBaseUrl, MessageDtoCollection.class);
   }
 
-  @SneakyThrows
   private ResponseEntity<MessageDto> postMessage(NewMessage newMessage) {
     HttpEntity<NewMessage> request = new HttpEntity<>(newMessage);
     var response = restTemplate.postForEntity(messagesBaseUrl, request, MessageDto.class);
@@ -105,5 +111,9 @@ class RestMessageControllerTest {
     }
 
     return response;
+  }
+
+  private void deleteMessage(String messageId) {
+    restTemplate.delete(messagesBaseUrl + "/" + messageId);
   }
 }

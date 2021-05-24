@@ -26,4 +26,14 @@ class InMemoryMessageRepositoryTest {
     assertThat(allMessages).containsExactly(message);
   }
 
+  @Test
+  void shouldDeleteMessage() {
+    var message = MessageFactory.create();
+    messageRepository.save(message);
+
+    messageRepository.deleteMessage(message.getId());
+
+    assertThat(messageRepository.getAll()).isEmpty();
+  }
+
 }

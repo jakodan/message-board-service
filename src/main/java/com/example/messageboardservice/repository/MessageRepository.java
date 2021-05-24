@@ -12,4 +12,6 @@ public interface MessageRepository {
   Collection<Message> getMessagesAfter(String messageId, int maxResults);
 
   Collection<Message> getMessagesBefore(String messageId, int maxResults);
+
+  void deleteMessage(String messageId);
 }

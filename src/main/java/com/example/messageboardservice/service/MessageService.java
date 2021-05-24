@@ -24,4 +24,8 @@ public class MessageService {
 
     return message;
   }
+
+  public void deleteMessage(String messageId) {
+    messageRepository.deleteMessage(messageId);
+  }
 }
