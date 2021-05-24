@@ -2,7 +2,7 @@ package com.example.messageboardservice.controller.dto;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.messageboardservice.service.model.Message;
+import com.example.messageboardservice.service.MessageFactory;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +10,7 @@ class MessageDtoCollectionTest {
 
   @Test
   void shouldCreateFromDomainMessages() {
-    var domainMessage = new Message("this is a message");
+    var domainMessage = MessageFactory.create();
 
     var result = MessageDtoCollection.createFrom(List.of(domainMessage));
 

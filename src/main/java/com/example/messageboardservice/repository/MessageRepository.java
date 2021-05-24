@@ -5,7 +5,7 @@ import java.util.Collection;
 
 public interface MessageRepository {
 
-  void save(String messageId, Message message);
+  void save(Message message);
 
   Collection<Message> getAll();
 

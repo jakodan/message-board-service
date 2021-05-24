@@ -6,4 +6,5 @@ import lombok.Value;
 public class Message {
 
   String text;
+  String id;
 }

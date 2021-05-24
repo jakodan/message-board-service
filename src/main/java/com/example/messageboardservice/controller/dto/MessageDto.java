@@ -7,8 +7,9 @@ import lombok.Value;
 public class MessageDto {
 
   String text;
+  String id;
 
-  static MessageDto createFrom(Message domainMessage) {
-    return new MessageDto(domainMessage.getText());
+  public static MessageDto createFrom(Message domainMessage) {
+    return new MessageDto(domainMessage.getText(), domainMessage.getId());
   }
 }

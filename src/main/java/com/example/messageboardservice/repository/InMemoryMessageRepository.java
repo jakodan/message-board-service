@@ -1,7 +1,6 @@
 package com.example.messageboardservice.repository;
 
 import com.example.messageboardservice.service.model.Message;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -16,13 +15,13 @@ public class InMemoryMessageRepository implements MessageRepository {
   }
 
   @Override
-  public void save(String messageId, Message message) {
-    messageMap.putIfAbsent(messageId, message);
+  public void save(Message message) {
+    messageMap.putIfAbsent(message.getId(), message);
   }
 
   @Override
   public Collection<Message> getAll() {
-    return new ArrayList<>(messageMap.values());
+    return new LinkedHashMap<>(messageMap).values();
   }
 
   @Override

@@ -16,12 +16,12 @@ public class MessageService {
     return messageRepository.getAll();
   }
 
-  public String createMessage(String text) {
-    var message = new Message(text);
-    var messageId = MessageIdCreator.createFrom(message);
+  public Message createMessage(String text) {
+    var messageId = MessageIdCreator.createFrom(text);
+    var message = new Message(text, messageId);
 
-    messageRepository.save(messageId, message);
+    messageRepository.save(message);
 
-    return messageId;
+    return message;
   }
 }

@@ -2,6 +2,7 @@ package com.example.messageboardservice.controller;
 
 import com.example.messageboardservice.controller.dto.MessageDto;
 import com.example.messageboardservice.controller.dto.MessageDtoCollection;
+import com.example.messageboardservice.controller.dto.NewMessage;
 import com.example.messageboardservice.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -39,15 +41,18 @@ public class RestMessageController {
   }
 
   @PostMapping
-  public ResponseEntity<MessageDto> postMessage(MessageDto messageDto) {
-    var messageId = messageService.createMessage(messageDto.getText());
-    var messageUri = messageURICreator.create(messageId);
+  public ResponseEntity<MessageDto> postMessage(@RequestBody NewMessage newMessage) {
+    var message = messageService.createMessage(newMessage.getText());
+    var messageUri = messageURICreator.create(message.getId());
 
-    return ResponseEntity.created(messageUri).build();
+    var responseBody = MessageDto.createFrom(message);
+
+    return ResponseEntity.created(messageUri).body(responseBody);
   }
 
   @PutMapping("/{message-id")
   public ResponseEntity<String> updateMesage() {
+
     throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED);
   }
 

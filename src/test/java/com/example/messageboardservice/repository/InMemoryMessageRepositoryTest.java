@@ -2,7 +2,7 @@ package com.example.messageboardservice.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.messageboardservice.service.model.Message;
+import com.example.messageboardservice.service.MessageFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,9 +17,9 @@ class InMemoryMessageRepositoryTest {
 
   @Test
   void shouldGetAllMessages() {
-    var message = new Message("this is a message");
-    var messageId = "123";
-    messageRepository.save(messageId, message);
+    var message = MessageFactory.create();
+
+    messageRepository.save(message);
 
     var allMessages = messageRepository.getAll();
 

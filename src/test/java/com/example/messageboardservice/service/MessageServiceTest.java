@@ -23,28 +23,31 @@ class MessageServiceTest {
   }
 
   @Test
-  void shouldReturnMessageId_whenCreatingMessage() {
-    var message = new Message("this is a message");
-    var messageId = messageService.createMessage(message.getText());
+  void shouldReturnMessage_whenCreatingMessage() {
+    var messageText = "this is a message";
 
-    var expectedMessageId = MessageIdCreator.createFrom(message);
+    var createdMessage = messageService.createMessage(messageText);
 
-    assertThat(messageId).isEqualTo(expectedMessageId);
+    var expectedMessageId = MessageIdCreator.createFrom(messageText);
+
+    assertThat(createdMessage).isEqualTo(new Message(messageText, expectedMessageId));
   }
 
   @Test
   void shouldSaveMessageToRepository() {
-    var message = new Message("this is a message");
-    var messageId = MessageIdCreator.createFrom(message);
+    var messageText = "this is a message";
+    var messageId = MessageIdCreator.createFrom(messageText);
+
+    var message = new Message(messageText, messageId);
 
     messageService.createMessage(message.getText());
 
-    verify(messageRepository).save(messageId, message);
+    verify(messageRepository).save(message);
   }
 
   @Test
   void shouldGetAllMessages() {
-    var message = new Message("this is a message");
+    var message = new Message("this is a message", "message-id");
     when(messageRepository.getAll()).thenReturn(List.of(message));
 
     var messages = messageService.getAllMessages();
