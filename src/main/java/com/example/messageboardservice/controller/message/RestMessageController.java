@@ -1,15 +1,18 @@
-package com.example.messageboardservice.controller;
+package com.example.messageboardservice.controller.message;
 
-import com.example.messageboardservice.controller.dto.MessageDto;
-import com.example.messageboardservice.controller.dto.MessageDtoCollection;
-import com.example.messageboardservice.controller.dto.NewMessage;
-import com.example.messageboardservice.controller.dto.UpdatedMessage;
+import com.example.messageboardservice.controller.message.dto.MessageDto;
+import com.example.messageboardservice.controller.message.dto.MessageDtoCollection;
+import com.example.messageboardservice.controller.message.dto.NewMessage;
+import com.example.messageboardservice.controller.message.dto.UpdatedMessage;
 import com.example.messageboardservice.service.MessageService;
 import com.example.messageboardservice.service.exception.MessageNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,7 +47,10 @@ public class RestMessageController {
   }
 
   @PostMapping
-  public ResponseEntity<MessageDto> postMessage(@RequestBody NewMessage newMessage) {
+  public ResponseEntity<MessageDto> postMessage(@RequestBody NewMessage newMessage,
+      @CurrentSecurityContext SecurityContext securityContext) {
+    var username = getUsername(securityContext);
+
     var message = messageService.createMessage(newMessage.getText());
     var messageUri = messageURICreator.create(message.getId());
 
@@ -54,8 +60,12 @@ public class RestMessageController {
   }
 
   @PutMapping("/{message-id}")
-  public ResponseEntity<Void> updateMesage(@PathVariable("message-id") String messageId, @RequestBody UpdatedMessage updatedMessage) {
+  public ResponseEntity<Void> updateMesage(
+      @PathVariable("message-id") String messageId,
+      @RequestBody UpdatedMessage updatedMessage,
+      @CurrentSecurityContext SecurityContext securityContext) {
     try {
+      var username = getUsername(securityContext);
       messageService.updateMessage(messageId, updatedMessage.getText());
       return ResponseEntity.ok().build();
     } catch (MessageNotFoundException e) {
@@ -64,8 +74,11 @@ public class RestMessageController {
   }
 
   @DeleteMapping("/{message-id}")
-  public ResponseEntity<Void> deleteMessage(@PathVariable("message-id") String messageId) {
+  public ResponseEntity<Void> deleteMessage(
+      @PathVariable("message-id") String messageId,
+      @CurrentSecurityContext SecurityContext securityContext) {
     try {
+      var username = getUsername(securityContext);
       messageService.deleteMessage(messageId);
       return ResponseEntity.ok().build();
     } catch (MessageNotFoundException e) {
@@ -73,4 +86,7 @@ public class RestMessageController {
     }
   }
 
+  private String getUsername(SecurityContext securityContext) {
+    return ((User) securityContext.getAuthentication().getPrincipal()).getUsername();
+  }
 }

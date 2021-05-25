@@ -1,6 +1,6 @@
 package com.example.messageboardservice.config;
 
-import com.example.messageboardservice.controller.MessageURICreator;
+import com.example.messageboardservice.controller.message.MessageURICreator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

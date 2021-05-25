@@ -2,10 +2,10 @@ package com.example.messageboardservice.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.messageboardservice.controller.dto.MessageDto;
-import com.example.messageboardservice.controller.dto.MessageDtoCollection;
-import com.example.messageboardservice.controller.dto.NewMessage;
-import com.example.messageboardservice.controller.dto.UpdatedMessage;
+import com.example.messageboardservice.controller.message.dto.MessageDto;
+import com.example.messageboardservice.controller.message.dto.MessageDtoCollection;
+import com.example.messageboardservice.controller.message.dto.NewMessage;
+import com.example.messageboardservice.controller.message.dto.UpdatedMessage;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;

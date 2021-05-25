@@ -1,4 +1,4 @@
-package com.example.messageboardservice.controller.dto;
+package com.example.messageboardservice.controller.message.dto;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
