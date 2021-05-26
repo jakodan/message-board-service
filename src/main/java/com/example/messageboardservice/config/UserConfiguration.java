@@ -22,9 +22,11 @@ public class UserConfiguration {
     this.passwordEncoder = passwordEncoder;
     this.userService = userService;
 
-    for (var user : userConfigurationProperties.getTestUsers()) {
-      log.info("Creating user with username {}", user.getUsername());
-      userService.createUser(user.getUsername(), passwordEncoder.encode(user.getPassword()));
+    if (userConfigurationProperties.getTestUsers() != null) {
+      for (var user : userConfigurationProperties.getTestUsers()) {
+        log.info("Creating user with username {}", user.getUsername());
+        userService.createUser(user.getUsername(), passwordEncoder.encode(user.getPassword()));
+      }
     }
   }
 }

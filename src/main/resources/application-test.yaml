@@ -1,0 +1,7 @@
+jwt:
+  secret-key: secret
+test-users:
+- username: Bob
+  password: Bob
+- username: Alice
+  password: Alice
