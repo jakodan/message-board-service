@@ -50,6 +50,7 @@ class RestMessageControllerTest {
   }
 
   private void setupAuthentication(String username, String password) {
+    headers.clear();
     var authenticationRequest = new AuthenticationRequest(username, password);
     var request = new HttpEntity<>(authenticationRequest);
     var response = restTemplate.postForEntity(authenticationBaseUrl + "/token", request, AuthenticationResponse.class);
@@ -142,6 +143,54 @@ class RestMessageControllerTest {
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
   }
 
+  @Test
+  void shouldReturn401_whenUserNotResourceOwner_whenDeleting() {
+    setupAuthentication("Bob", "Bob");
+    var message = new NewMessage("new message");
+    var createdMessage = postMessage(message);
+    setupAuthentication("Alice", "Alice");
+    var response = deleteMessage(createdMessage.getBody().getId());
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    setupAuthentication("Bob", "Bob");
+  }
+
+  @Test
+  void shouldReturn401_whenUserNotResourceOwner_whenUpdating() {
+    setupAuthentication("Bob", "Bob");
+    var message = new NewMessage("new message");
+    var createdMessage = postMessage(message);
+    setupAuthentication("Alice", "Alice");
+    var response = updateMessage(createdMessage.getBody().getId(), new UpdatedMessage("updatedMessage"));
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    setupAuthentication("Bob", "Bob");
+  }
+
+  @Test
+  void shouldAllowDeletion_afterReAuthentication() {
+    setupAuthentication("Bob", "Bob");
+    var message = new NewMessage("new message");
+    var createdMessage = postMessage(message);
+    setupAuthentication("Bob", "Bob"); //setup authentication again, will generate new jwt
+
+    var response = deleteMessage(createdMessage.getBody().getId());
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+  }
+
+  @Test
+  void shouldAllowUpdate_afterReAuthentication() {
+    setupAuthentication("Bob", "Bob");
+    var message = new NewMessage("new message");
+    var createdMessage = postMessage(message);
+    setupAuthentication("Bob", "Bob"); //setup authentication again, will generate new jwt
+
+    var response = updateMessage(createdMessage.getBody().getId(), new UpdatedMessage("updatedMessage"));
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+  }
+
   private ResponseEntity<MessageDtoCollection> getAllMessages() {
     return restTemplate.getForEntity(messagesBaseUrl, MessageDtoCollection.class);
   }
@@ -160,13 +209,13 @@ class RestMessageControllerTest {
     return response;
   }
 
-  private void deleteMessage(String messageId) {
+  private ResponseEntity<String> deleteMessage(String messageId) {
     var request = new HttpEntity<>(headers);
-    restTemplate.exchange(messagesBaseUrl + "/" + messageId, HttpMethod.DELETE, request, String.class);
+    return restTemplate.exchange(messagesBaseUrl + "/" + messageId, HttpMethod.DELETE, request, String.class);
   }
 
-  private void updateMessage(String messageId, UpdatedMessage updatedMessage) {
+  private ResponseEntity<String> updateMessage(String messageId, UpdatedMessage updatedMessage) {
     var request = new HttpEntity<>(updatedMessage, headers);
-    restTemplate.put(messagesBaseUrl + "/" + messageId, request);
+    return restTemplate.exchange(messagesBaseUrl + "/" + messageId, HttpMethod.PUT, request, String.class);
   }
 }
