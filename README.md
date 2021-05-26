@@ -133,6 +133,6 @@ Response:
 ```
 
 #### Verifying authorization
-To verify the authorization of UPDATE and DELETE'ing a message by making authenticating as user `Bob` and creating a message, 
+To verify the authorization of UPDATE and DELETE'ing a message, first authenticate as user `Bob` and create a message, 
 then authenticate as user `Alice` and try to delete or update Bobs message. The service will return a `401 UNAUTHORIZED` response. <br>
 This is of course also tested and verified in unit tests for the application.
