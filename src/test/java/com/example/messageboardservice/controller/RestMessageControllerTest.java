@@ -86,6 +86,7 @@ class RestMessageControllerTest {
 
   @Test
   void shouldGetEmptyListWhenNoMessages() {
+    headers.clear(); //no authentication required
     var messageDtoCollection = getAllMessages().getBody();
 
     assertThat(messageDtoCollection.getMessages()).isEmpty();
@@ -187,6 +188,74 @@ class RestMessageControllerTest {
     setupAuthentication("Bob", "Bob"); //setup authentication again, will generate new jwt
 
     var response = updateMessage(createdMessage.getBody().getId(), new UpdatedMessage("updatedMessage"));
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+  }
+
+  @Test
+  void shouldReturnUnauthorized_whenNoAuthorizationHeader_whenPosting() {
+    headers.clear();
+
+    var message = new NewMessage("new message");
+    var response = postMessage(message);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+  }
+
+  @Test
+  void shouldReturnUnauthorized_whenNoAuthorizationHeader_whenDeleting() {
+    headers.clear();
+
+    var response = deleteMessage("messageId");
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+  }
+
+  @Test
+  void shouldReturnUnauthorized_whenNoAuthorizationHeader_whenUpdating() {
+    headers.clear();
+
+    var response = updateMessage("messageId", new UpdatedMessage("text"));
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+  }
+
+  @Test
+  void shouldReturnUnauthorized_whenInvalidJwtToken_whenPosting() {
+    headers.clear();
+    headers.add("Authorization", "invalid");
+
+    var response = postMessage(new NewMessage("text"));
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+  }
+
+  @Test
+  void shouldReturnUnauthorized_whenInvalidJwtToken_whenUpdating() {
+    headers.clear();
+    headers.add("Authorization", "invalid");
+
+    var response = updateMessage("messageId", new UpdatedMessage("text"));
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+  }
+
+  @Test
+  void shouldReturnUnauthorized_whenInvalidJwtToken_whenDeleting() {
+    headers.clear();
+    headers.add("Authorization", "invalid");
+
+    var response = deleteMessage("messageId");
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+  }
+
+  @Test
+  void shouldIgnoreInvalidAuthorizationToken_whenGettingAllMessages() {
+    headers.clear();
+    headers.add("Authorization", "invalid");
+
+    var response = getAllMessages();
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
   }
