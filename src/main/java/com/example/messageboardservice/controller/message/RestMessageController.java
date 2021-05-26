@@ -6,6 +6,7 @@ import com.example.messageboardservice.controller.message.dto.NewMessage;
 import com.example.messageboardservice.controller.message.dto.UpdatedMessage;
 import com.example.messageboardservice.service.MessageService;
 import com.example.messageboardservice.service.exception.MessageNotFoundException;
+import com.example.messageboardservice.service.exception.UnauthorizedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -51,7 +52,7 @@ public class RestMessageController {
       @CurrentSecurityContext SecurityContext securityContext) {
     var username = getUsername(securityContext);
 
-    var message = messageService.createMessage(newMessage.getText());
+    var message = messageService.createMessage(newMessage.getText(), username);
     var messageUri = messageURICreator.create(message.getId());
 
     var responseBody = MessageDto.createFrom(message);
@@ -66,10 +67,12 @@ public class RestMessageController {
       @CurrentSecurityContext SecurityContext securityContext) {
     try {
       var username = getUsername(securityContext);
-      messageService.updateMessage(messageId, updatedMessage.getText());
+      messageService.updateMessage(messageId, updatedMessage.getText(), username);
       return ResponseEntity.ok().build();
     } catch (MessageNotFoundException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    } catch (UnauthorizedException e) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
   }
 
@@ -79,10 +82,12 @@ public class RestMessageController {
       @CurrentSecurityContext SecurityContext securityContext) {
     try {
       var username = getUsername(securityContext);
-      messageService.deleteMessage(messageId);
+      messageService.deleteMessage(messageId, username);
       return ResponseEntity.ok().build();
     } catch (MessageNotFoundException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    } catch (UnauthorizedException e) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
   }
 

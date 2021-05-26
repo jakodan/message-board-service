@@ -15,5 +15,6 @@ class MessageDtoTest {
 
     assertThat(messageDto.getText()).isEqualTo(domainMessage.getText());
     assertThat(messageDto.getId()).isEqualTo(domainMessage.getId());
+    assertThat(messageDto.getAuthor()).isEqualTo(domainMessage.getAuthor());
   }
 }

@@ -8,8 +8,9 @@ public class MessageDto {
 
   String text;
   String id;
+  String author;
 
   public static MessageDto createFrom(Message domainMessage) {
-    return new MessageDto(domainMessage.getText(), domainMessage.getId());
+    return new MessageDto(domainMessage.getText(), domainMessage.getId(), domainMessage.getAuthor());
   }
 }

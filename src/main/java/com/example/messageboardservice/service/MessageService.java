@@ -16,20 +16,20 @@ public class MessageService {
     return messageRepository.getAll();
   }
 
-  public Message createMessage(String text) {
-    var messageId = MessageIdCreator.createFrom(text);
-    var message = new Message(text, messageId);
+  public Message createMessage(String text, String author) {
+    var messageId = MessageIdCreator.createFrom(text, author);
+    var message = new Message(text, messageId, author);
 
     messageRepository.save(message);
 
     return message;
   }
 
-  public void deleteMessage(String messageId) {
-    messageRepository.deleteMessage(messageId);
+  public void deleteMessage(String messageId, String username) {
+    messageRepository.deleteMessage(messageId, username);
   }
 
-  public void updateMessage(String messageId, String newText) {
-    messageRepository.updateMessageText(messageId, newText);
+  public void updateMessage(String messageId, String newText, String username) {
+    messageRepository.updateMessageText(messageId, newText, username);
   }
 }

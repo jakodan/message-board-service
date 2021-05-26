@@ -5,9 +5,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.example.messageboardservice.service.MessageFactory;
 import com.example.messageboardservice.service.exception.MessageNotFoundException;
+import com.example.messageboardservice.service.exception.UnauthorizedException;
 import com.example.messageboardservice.service.model.Message;
+import java.security.SecureRandom;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 class InMemoryMessageRepositoryTest {
 
@@ -30,11 +34,11 @@ class InMemoryMessageRepositoryTest {
   }
 
   @Test
-  void shouldDeleteMessage() {
+  void shouldDeleteMessage_whenUsernameIsAuthor() {
     var message = MessageFactory.create();
     messageRepository.save(message);
 
-    messageRepository.deleteMessage(message.getId());
+    messageRepository.deleteMessage(message.getId(), message.getAuthor());
 
     assertThat(messageRepository.getAll()).isEmpty();
   }
@@ -46,34 +50,78 @@ class InMemoryMessageRepositoryTest {
 
     var updatedMessageText = message.getText() + " updated";
 
-    messageRepository.updateMessageText(message.getId(), updatedMessageText);
+    messageRepository.updateMessageText(message.getId(), updatedMessageText, message.getAuthor());
 
-    var expectedMessage = new Message(updatedMessageText, message.getId());
+    var expectedMessage = new Message(updatedMessageText, message.getId(), message.getAuthor());
     var updatedMessage = messageRepository.getAll().stream().findFirst().orElseThrow();
     assertThat(updatedMessage).isEqualTo(expectedMessage);
   }
 
   @Test
   void shouldThrowMessageNotFoundException_whenUpdatingAndNotFound() {
-    assertThatThrownBy(() -> messageRepository.updateMessageText("non-existing-message-id", "text update"))
+    assertThatThrownBy(() -> messageRepository.updateMessageText("non-existing-message-id", "text update", "test-user"))
         .isInstanceOf(MessageNotFoundException.class);
   }
 
   @Test
   void shouldThrowMessageNotFoundException_whenDeletingAndNotFound() {
-    assertThatThrownBy(() -> messageRepository.deleteMessage("non-existing-message-id"))
+    assertThatThrownBy(() -> messageRepository.deleteMessage("non-existing-message-id", "test-user"))
         .isInstanceOf(MessageNotFoundException.class);
   }
 
   @Test
   void shouldKeepInsertionOrderOfMessages() {
-    var message1 = new Message("text", "1");
-    var message2 = new Message("text", "2");
+    var numberOfMessages = 1000;
+    var random = new SecureRandom();
+    var messages = new Message[numberOfMessages];
 
-    messageRepository.save(message2);
-    messageRepository.save(message1);
+    for (int i = 0; i < numberOfMessages; i++) {
+      var m = new Message("text", Integer.toString(random.nextInt()), "test-author");
+      messages[i] = m;
+      messageRepository.save(m);
+    }
 
-    assertThat(messageRepository.getAll()).containsExactly(message2, message1);
+    assertThat(messageRepository.getAll()).containsExactly(messages);
   }
 
+  @Test
+  void shouldThrowUnauthorizedException_whenDeleting_andAuthorAndUsernameMismatch() {
+    var message = MessageFactory.create();
+    messageRepository.save(message);
+
+    assertThatThrownBy(() -> messageRepository.deleteMessage(message.getId(), message.getAuthor() + " wrong"))
+        .isInstanceOf(UnauthorizedException.class);
+  }
+
+  @ParameterizedTest
+  @NullAndEmptySource
+  void shouldThrow_whenDeleting_andNullOrEmptyInput(String input) {
+    assertThatThrownBy(() -> messageRepository.deleteMessage(input, "username"))
+        .isInstanceOf(IllegalArgumentException.class);
+
+    assertThatThrownBy(() -> messageRepository.deleteMessage("messageId", input))
+        .isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @ParameterizedTest
+  @NullAndEmptySource
+  void shouldThrow_whenUpdating_andNullOrEmptyInput(String input) {
+    assertThatThrownBy(() -> messageRepository.updateMessageText(input, "newText", "test-user"))
+        .isInstanceOf(IllegalArgumentException.class);
+
+    assertThatThrownBy(() -> messageRepository.updateMessageText("messageId", input, "test-user"))
+        .isInstanceOf(IllegalArgumentException.class);
+
+    assertThatThrownBy(() -> messageRepository.updateMessageText("messageId", "newText", input))
+        .isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @Test
+  void shouldThrowUnauthorizedException_whenUpdating_andAuthorAndUsernameMismatch() {
+    var message = MessageFactory.create();
+    messageRepository.save(message);
+
+    assertThatThrownBy(() -> messageRepository.updateMessageText(message.getId(), "newText", message.getAuthor() + " wrong"))
+        .isInstanceOf(UnauthorizedException.class);
+  }
 }

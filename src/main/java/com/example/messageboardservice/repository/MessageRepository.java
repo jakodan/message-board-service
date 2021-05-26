@@ -9,7 +9,7 @@ public interface MessageRepository {
 
   Collection<Message> getAll();
 
-  void deleteMessage(String messageId);
+  void deleteMessage(String messageId, String username);
 
-  void updateMessageText(String messageId, String newText);
+  void updateMessageText(String messageId, String newText, String username);
 }

@@ -25,29 +25,31 @@ class MessageServiceTest {
   @Test
   void shouldReturnMessage_whenCreatingMessage() {
     var messageText = "this is a message";
+    var author = "test-user";
 
-    var createdMessage = messageService.createMessage(messageText);
+    var createdMessage = messageService.createMessage(messageText, author);
 
-    var expectedMessageId = MessageIdCreator.createFrom(messageText);
+    var expectedMessageId = MessageIdCreator.createFrom(messageText, author);
 
-    assertThat(createdMessage).isEqualTo(new Message(messageText, expectedMessageId));
+    assertThat(createdMessage).isEqualTo(new Message(messageText, expectedMessageId, author));
   }
 
   @Test
   void shouldSaveMessageToRepository() {
     var messageText = "this is a message";
-    var messageId = MessageIdCreator.createFrom(messageText);
+    var author = "test-user";
+    var messageId = MessageIdCreator.createFrom(messageText, author);
 
-    var message = new Message(messageText, messageId);
+    var message = new Message(messageText, messageId, author);
 
-    messageService.createMessage(message.getText());
+    messageService.createMessage(message.getText(), author);
 
     verify(messageRepository).save(message);
   }
 
   @Test
   void shouldGetAllMessages() {
-    var message = new Message("this is a message", "message-id");
+    var message = new Message("this is a message", "message-id", "author");
     when(messageRepository.getAll()).thenReturn(List.of(message));
 
     var messages = messageService.getAllMessages();
@@ -58,19 +60,21 @@ class MessageServiceTest {
   @Test
   void shouldDeleteMessage() {
     var messageId = "123";
+    var username = "test-user";
 
-    messageService.deleteMessage(messageId);
+    messageService.deleteMessage(messageId, username);
 
-    verify(messageRepository).deleteMessage(messageId);
+    verify(messageRepository).deleteMessage(messageId, username);
   }
 
   @Test
   void shouldUpdateMessage() {
     var messageId = "123";
     var newText = "new text";
+    var username = "test-user";
 
-    messageService.updateMessage(messageId, newText);
+    messageService.updateMessage(messageId, newText, username);
 
-    verify(messageRepository).updateMessageText(messageId, newText);
+    verify(messageRepository).updateMessageText(messageId, newText, username);
   }
 }

@@ -9,4 +9,5 @@ public class Message {
 
   String text;
   String id;
+  String author;
 }
