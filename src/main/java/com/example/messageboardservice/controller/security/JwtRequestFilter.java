@@ -1,6 +1,6 @@
 package com.example.messageboardservice.controller.security;
 
-import com.example.messageboardservice.repository.UserRepository;
+import com.example.messageboardservice.service.UserService;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -15,11 +15,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-  private final UserRepository userRepository;
+  private final UserService userService;
   private final JwtUtil jwtUtil;
 
-  public JwtRequestFilter(UserRepository userRepository, JwtUtil jwtUtil) {
-    this.userRepository = userRepository;
+  public JwtRequestFilter(UserService userService, JwtUtil jwtUtil) {
+    this.userService = userService;
     this.jwtUtil = jwtUtil;
   }
 
@@ -40,7 +40,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
       return;
     }
 
-    var userDetails = userRepository.loadUserByUsername(jwtUtil.extractUsername(jwt));
+    var userDetails = userService.loadUserByUsername(jwtUtil.extractUsername(jwt));
 
     var authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

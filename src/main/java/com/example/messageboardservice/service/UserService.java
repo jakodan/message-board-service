@@ -1,5 +1,7 @@
-package com.example.messageboardservice.repository;
+package com.example.messageboardservice.service;
 
+import com.example.messageboardservice.service.model.MessageUser;
+import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.User;
@@ -8,11 +10,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 @Slf4j
-public class UserRepository implements UserDetailsService {
+public class UserService implements UserDetailsService {
 
   private final Map<String, User> users;
 
-  public UserRepository(Map<String, User> users) {
+  public UserService(Map<String, User> users) {
     this.users = users;
   }
 
@@ -25,5 +27,9 @@ public class UserRepository implements UserDetailsService {
     }
 
     return user;
+  }
+
+  public void createUser(String username, String encodedPassword) {
+    users.put(username, new MessageUser(username, encodedPassword, List.of()));
   }
 }

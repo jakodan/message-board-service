@@ -1,7 +1,8 @@
 package com.example.messageboardservice.config;
 
 import com.example.messageboardservice.controller.security.JwtRequestFilter;
-import com.example.messageboardservice.repository.UserRepository;
+import com.example.messageboardservice.service.UserService;
+import java.security.SecureRandom;
 import javax.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
 import org.springframework.context.annotation.Bean;
@@ -13,25 +14,26 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-  private final UserRepository userRepository;
+  private static final int BCRYPT_STRENGTH = 10;
+  private final UserService userService;
   private final JwtRequestFilter jwtRequestFilter;
 
-  public SecurityConfig(UserRepository userRepository,
+  public SecurityConfig(UserService userService,
       JwtRequestFilter jwtRequestFilter) {
-    this.userRepository = userRepository;
+    this.userService = userService;
     this.jwtRequestFilter = jwtRequestFilter;
   }
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    auth.userDetailsService(userRepository);
+    auth.userDetailsService(userService);
   }
 
   @Override
@@ -62,7 +64,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   @Bean
   @Primary
   public PasswordEncoder passwordEncoder() {
-    return NoOpPasswordEncoder.getInstance();
+    return new BCryptPasswordEncoder(BCRYPT_STRENGTH, new SecureRandom());
   }
 
   @Bean(name = "myAuthenticationManager")

@@ -3,7 +3,7 @@ package com.example.messageboardservice.controller;
 import com.example.messageboardservice.controller.dto.AuthenticationRequest;
 import com.example.messageboardservice.controller.dto.AuthenticationResponse;
 import com.example.messageboardservice.controller.security.JwtUtil;
-import com.example.messageboardservice.repository.UserRepository;
+import com.example.messageboardservice.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,13 +25,13 @@ import org.springframework.web.server.ResponseStatusException;
 public class RESTAuthenticationController {
 
   private final AuthenticationManager authenticationManager;
-  private final UserRepository userRepository;
+  private final UserService userService;
   private final JwtUtil jwtUtil;
 
   public RESTAuthenticationController(AuthenticationManager authenticationManager,
-      UserRepository userRepository, JwtUtil jwtUtil) {
+      UserService userService, JwtUtil jwtUtil) {
     this.authenticationManager = authenticationManager;
-    this.userRepository = userRepository;
+    this.userService = userService;
     this.jwtUtil = jwtUtil;
   }
 
@@ -46,7 +46,7 @@ public class RESTAuthenticationController {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 
-    var userDetails = userRepository.loadUserByUsername(request.getUsername());
+    var userDetails = userService.loadUserByUsername(request.getUsername());
     var jwt = jwtUtil.generateToken(userDetails);
 
     return ResponseEntity.ok(new AuthenticationResponse(jwt));
