@@ -1,4 +1,4 @@
-package com.example.messageboardservice.controller.authentication.dto;
+package com.example.messageboardservice.controller.dto;
 
 import lombok.Value;
 

@@ -1,6 +1,6 @@
 package com.example.messageboardservice.config;
 
-import com.example.messageboardservice.controller.authentication.JwtRequestFilter;
+import com.example.messageboardservice.controller.security.JwtRequestFilter;
 import com.example.messageboardservice.repository.UserRepository;
 import javax.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
@@ -49,7 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .authenticationEntryPoint(
             (request, response, ex) -> {
               response.sendError(
-                  HttpServletResponse.SC_UNAUTHORIZED,
+                  HttpServletResponse.SC_UNAUTHORIZED, //return 401 instead of 403 in cases where Authorization header is invalid or missing
                   ex.getMessage()
               );
             }

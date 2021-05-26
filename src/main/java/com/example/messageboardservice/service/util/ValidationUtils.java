@@ -1,4 +1,4 @@
-package com.example.messageboardservice.service;
+package com.example.messageboardservice.service.util;
 
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;

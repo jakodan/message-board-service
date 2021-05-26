@@ -1,9 +1,9 @@
 package com.example.messageboardservice.repository;
 
-import com.example.messageboardservice.service.ValidationUtils;
 import com.example.messageboardservice.service.exception.MessageNotFoundException;
 import com.example.messageboardservice.service.exception.UnauthorizedException;
 import com.example.messageboardservice.service.model.Message;
+import com.example.messageboardservice.service.util.ValidationUtils;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;

@@ -1,6 +1,7 @@
 package com.example.messageboardservice.config;
 
-import com.example.messageboardservice.controller.authentication.JwtRequestFilter;
+import com.example.messageboardservice.controller.security.JwtRequestFilter;
+import com.example.messageboardservice.controller.security.JwtUtil;
 import com.example.messageboardservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

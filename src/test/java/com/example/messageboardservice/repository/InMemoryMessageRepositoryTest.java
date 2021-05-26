@@ -3,10 +3,10 @@ package com.example.messageboardservice.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.example.messageboardservice.service.MessageFactory;
 import com.example.messageboardservice.service.exception.MessageNotFoundException;
 import com.example.messageboardservice.service.exception.UnauthorizedException;
 import com.example.messageboardservice.service.model.Message;
+import com.example.messageboardservice.testutil.MessageFactory;
 import java.security.SecureRandom;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

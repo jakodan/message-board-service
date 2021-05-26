@@ -1,4 +1,4 @@
-package com.example.messageboardservice.config;
+package com.example.messageboardservice.controller.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

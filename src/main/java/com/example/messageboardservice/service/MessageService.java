@@ -2,6 +2,7 @@ package com.example.messageboardservice.service;
 
 import com.example.messageboardservice.repository.MessageRepository;
 import com.example.messageboardservice.service.model.Message;
+import com.example.messageboardservice.service.util.MessageIdCreator;
 import java.util.Collection;
 
 public class MessageService {

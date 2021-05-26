@@ -1,4 +1,4 @@
-package com.example.messageboardservice.service;
+package com.example.messageboardservice.testutil;
 
 import com.example.messageboardservice.service.model.Message;
 import lombok.experimental.UtilityClass;

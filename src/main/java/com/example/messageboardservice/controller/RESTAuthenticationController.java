@@ -1,8 +1,8 @@
-package com.example.messageboardservice.controller.authentication;
+package com.example.messageboardservice.controller;
 
-import com.example.messageboardservice.config.JwtUtil;
-import com.example.messageboardservice.controller.authentication.dto.AuthenticationRequest;
-import com.example.messageboardservice.controller.authentication.dto.AuthenticationResponse;
+import com.example.messageboardservice.controller.dto.AuthenticationRequest;
+import com.example.messageboardservice.controller.dto.AuthenticationResponse;
+import com.example.messageboardservice.controller.security.JwtUtil;
 import com.example.messageboardservice.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,13 +22,13 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping(
     path = "/auth",
     produces = MediaType.APPLICATION_JSON_VALUE)
-public class AuthenticationController {
+public class RESTAuthenticationController {
 
   private final AuthenticationManager authenticationManager;
   private final UserRepository userRepository;
   private final JwtUtil jwtUtil;
 
-  public AuthenticationController(AuthenticationManager authenticationManager,
+  public RESTAuthenticationController(AuthenticationManager authenticationManager,
       UserRepository userRepository, JwtUtil jwtUtil) {
     this.authenticationManager = authenticationManager;
     this.userRepository = userRepository;

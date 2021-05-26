@@ -1,4 +1,4 @@
-package com.example.messageboardservice.controller.message;
+package com.example.messageboardservice.controller.util;
 
 import java.net.URI;
 

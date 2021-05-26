@@ -2,12 +2,12 @@ package com.example.messageboardservice.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.messageboardservice.controller.authentication.dto.AuthenticationRequest;
-import com.example.messageboardservice.controller.authentication.dto.AuthenticationResponse;
-import com.example.messageboardservice.controller.message.dto.MessageDto;
-import com.example.messageboardservice.controller.message.dto.MessageDtoCollection;
-import com.example.messageboardservice.controller.message.dto.NewMessage;
-import com.example.messageboardservice.controller.message.dto.UpdatedMessage;
+import com.example.messageboardservice.controller.dto.AuthenticationRequest;
+import com.example.messageboardservice.controller.dto.AuthenticationResponse;
+import com.example.messageboardservice.controller.dto.MessageDto;
+import com.example.messageboardservice.controller.dto.MessageDtoCollection;
+import com.example.messageboardservice.controller.dto.NewMessage;
+import com.example.messageboardservice.controller.dto.UpdatedMessage;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -27,7 +27,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-class RestMessageControllerTest {
+class RESTMessageControllerTest {
 
   @LocalServerPort
   private int port;
@@ -54,6 +54,7 @@ class RestMessageControllerTest {
     var authenticationRequest = new AuthenticationRequest(username, password);
     var request = new HttpEntity<>(authenticationRequest);
     var response = restTemplate.postForEntity(authenticationBaseUrl + "/token", request, AuthenticationResponse.class);
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     headers.add("Authorization", "Bearer " + response.getBody().getJwt());
   }
 

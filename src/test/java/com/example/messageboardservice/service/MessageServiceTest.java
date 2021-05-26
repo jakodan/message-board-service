@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import com.example.messageboardservice.repository.MessageRepository;
 import com.example.messageboardservice.service.model.Message;
+import com.example.messageboardservice.service.util.MessageIdCreator;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

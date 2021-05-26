@@ -1,8 +1,8 @@
-package com.example.messageboardservice.controller.message.dto;
+package com.example.messageboardservice.controller.dto;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.messageboardservice.service.MessageFactory;
+import com.example.messageboardservice.testutil.MessageFactory;
 import org.junit.jupiter.api.Test;
 
 class MessageDtoTest {

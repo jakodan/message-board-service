@@ -1,10 +1,10 @@
-package com.example.messageboardservice.controller.authentication;
+package com.example.messageboardservice.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.messageboardservice.config.JwtUtil;
-import com.example.messageboardservice.controller.authentication.dto.AuthenticationRequest;
-import com.example.messageboardservice.controller.authentication.dto.AuthenticationResponse;
+import com.example.messageboardservice.controller.dto.AuthenticationRequest;
+import com.example.messageboardservice.controller.dto.AuthenticationResponse;
+import com.example.messageboardservice.controller.security.JwtUtil;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-class AuthenticationControllerTest {
+class RESTAuthenticationControllerTest {
 
   @LocalServerPort
   private int port;

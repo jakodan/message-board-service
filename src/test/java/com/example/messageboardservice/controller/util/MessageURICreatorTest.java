@@ -1,8 +1,7 @@
-package com.example.messageboardservice.controller;
+package com.example.messageboardservice.controller.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.messageboardservice.controller.message.MessageURICreator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

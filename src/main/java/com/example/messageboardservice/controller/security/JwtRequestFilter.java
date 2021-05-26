@@ -1,6 +1,5 @@
-package com.example.messageboardservice.controller.authentication;
+package com.example.messageboardservice.controller.security;
 
-import com.example.messageboardservice.config.JwtUtil;
 import com.example.messageboardservice.repository.UserRepository;
 import java.io.IOException;
 import javax.servlet.FilterChain;

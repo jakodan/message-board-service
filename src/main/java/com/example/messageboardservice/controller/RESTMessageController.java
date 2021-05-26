@@ -1,9 +1,10 @@
-package com.example.messageboardservice.controller.message;
+package com.example.messageboardservice.controller;
 
-import com.example.messageboardservice.controller.message.dto.MessageDto;
-import com.example.messageboardservice.controller.message.dto.MessageDtoCollection;
-import com.example.messageboardservice.controller.message.dto.NewMessage;
-import com.example.messageboardservice.controller.message.dto.UpdatedMessage;
+import com.example.messageboardservice.controller.dto.MessageDto;
+import com.example.messageboardservice.controller.dto.MessageDtoCollection;
+import com.example.messageboardservice.controller.dto.NewMessage;
+import com.example.messageboardservice.controller.dto.UpdatedMessage;
+import com.example.messageboardservice.controller.util.MessageURICreator;
 import com.example.messageboardservice.service.MessageService;
 import com.example.messageboardservice.service.exception.MessageNotFoundException;
 import com.example.messageboardservice.service.exception.UnauthorizedException;
@@ -29,12 +30,12 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping(
     path = "/messages",
     produces = MediaType.APPLICATION_JSON_VALUE)
-public class RestMessageController {
+public class RESTMessageController {
 
   private final MessageURICreator messageURICreator;
   private final MessageService messageService;
 
-  public RestMessageController(MessageURICreator messageURICreator, MessageService messageService) {
+  public RESTMessageController(MessageURICreator messageURICreator, MessageService messageService) {
     this.messageURICreator = messageURICreator;
     this.messageService = messageService;
   }
