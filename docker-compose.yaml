@@ -1,0 +1,10 @@
+version: "3.3"
+
+services:
+  message-board-service:
+    build: .
+    ports:
+    - "8080:8080"
+    container_name: "message-board-service"
+    labels:
+    - "spring.profiles.active=test"
