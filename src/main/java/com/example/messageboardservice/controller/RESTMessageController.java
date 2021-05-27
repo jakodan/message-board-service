@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,7 +50,7 @@ public class RESTMessageController {
   }
 
   @PostMapping
-  public ResponseEntity<MessageDto> postMessage(@RequestBody NewMessage newMessage,
+  public ResponseEntity<MessageDto> postMessage(@Validated @RequestBody NewMessage newMessage,
       @CurrentSecurityContext SecurityContext securityContext) {
     var username = getUsername(securityContext);
 
@@ -64,7 +65,7 @@ public class RESTMessageController {
   @PutMapping("/{message-id}")
   public ResponseEntity<Void> updateMesage(
       @PathVariable("message-id") String messageId,
-      @RequestBody UpdatedMessage updatedMessage,
+      @Validated @RequestBody UpdatedMessage updatedMessage,
       @CurrentSecurityContext SecurityContext securityContext) {
     try {
       var username = getUsername(securityContext);

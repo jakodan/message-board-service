@@ -10,6 +10,7 @@ import com.example.messageboardservice.controller.dto.NewMessage;
 import com.example.messageboardservice.controller.dto.UpdatedMessage;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -261,6 +262,25 @@ class RESTMessageControllerTest {
     var response = getAllMessages();
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+  }
+
+  @Test
+  void shouldNotAllowMessageTextWithLessThan3Characters() {
+    var message = new NewMessage("m");
+
+    var response = postMessage(message);
+
+    assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
+  }
+
+  @Test
+  void shouldNotAllowMessageTextWithMoreThan250Characters() {
+    var text = StringUtils.repeat("m", 251);
+    var message = new NewMessage(text);
+
+    var response = postMessage(message);
+
+    assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
   }
 
   private ResponseEntity<MessageDtoCollection> getAllMessages() {
