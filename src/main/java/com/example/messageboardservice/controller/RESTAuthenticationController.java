@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,9 +48,47 @@ public class RESTAuthenticationController {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 
-    var userDetails = userService.loadUserByUsername(request.getUsername());
-    var jwt = jwtUtil.generateToken(userDetails);
+    return generateAuthenticationResponse(request.getUsername());
 
-    return ResponseEntity.ok(new AuthenticationResponse(jwt));
+  }
+
+  @PostMapping("/refresh")
+  public ResponseEntity<AuthenticationResponse> refreshAuthentication(
+      @CookieValue(name = "refresh_token", required = false) String refreshTokenCookie) {
+    if (jwtUtil.validateRefreshToken(refreshTokenCookie)) {
+      var username = jwtUtil.extractUsername(refreshTokenCookie);
+
+      return generateAuthenticationResponse(username);
+    } else {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+    }
+  }
+
+  @DeleteMapping("/refresh")
+  public ResponseEntity<Void> deleteRefreshToken() {
+    return ResponseEntity.status(HttpStatus.OK)
+        .header("Set-Cookie", createExpiredRefreshTokenCookie())
+        .build();
+  }
+
+  private ResponseEntity<AuthenticationResponse> generateAuthenticationResponse(String username) {
+    var accessToken = jwtUtil.generateAccessToken(username);
+    var refreshToken = jwtUtil.generateRefreshToken(username);
+
+    var authenticationResponse = AuthenticationResponse.builder()
+        .accessToken(accessToken)
+        .build();
+
+    return ResponseEntity.status(HttpStatus.OK)
+        .header("Set-Cookie", createRefreshTokenCookie(refreshToken))
+        .body(authenticationResponse);
+  }
+
+  private String createRefreshTokenCookie(String refreshToken) {
+    return String.format("refresh_token=%s; Path=/; Max-Age=31536000; SameSite=Strict; Secure; HttpOnly", refreshToken);
+  }
+
+  private String createExpiredRefreshTokenCookie() {
+    return "refresh_token=; Path=/; Max-Age=-1; SameSite=Strict; Secure; HttpOnly";
   }
 }

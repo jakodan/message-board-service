@@ -8,6 +8,7 @@ import com.example.messageboardservice.service.exception.UnauthorizedException;
 import com.example.messageboardservice.service.model.Message;
 import com.example.messageboardservice.testutil.MessageFactory;
 import java.security.SecureRandom;
+import java.time.OffsetDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -52,9 +53,9 @@ class InMemoryMessageRepositoryTest {
 
     messageRepository.updateMessageText(message.getId(), updatedMessageText, message.getAuthor());
 
-    var expectedMessage = new Message(updatedMessageText, message.getId(), message.getAuthor());
+    var expectedMessage = new Message(updatedMessageText, message.getId(), message.getAuthor(), null);
     var updatedMessage = messageRepository.getAll().stream().findFirst().orElseThrow();
-    assertThat(updatedMessage).isEqualTo(expectedMessage);
+    assertThat(updatedMessage).usingRecursiveComparison().ignoringFields("createdAt").isEqualTo(expectedMessage);
   }
 
   @Test
@@ -76,7 +77,7 @@ class InMemoryMessageRepositoryTest {
     var messages = new Message[numberOfMessages];
 
     for (int i = 0; i < numberOfMessages; i++) {
-      var m = new Message("text", Integer.toString(random.nextInt()), "test-author");
+      var m = new Message("text", Integer.toString(random.nextInt()), "test-author", OffsetDateTime.now());
       messages[i] = m;
       messageRepository.save(m);
     }

@@ -8,8 +8,10 @@ import com.example.messageboardservice.controller.dto.MessageDto;
 import com.example.messageboardservice.controller.dto.MessageDtoCollection;
 import com.example.messageboardservice.controller.dto.NewMessage;
 import com.example.messageboardservice.controller.dto.UpdatedMessage;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,7 +60,7 @@ class RESTMessageControllerTest {
     var request = new HttpEntity<>(authenticationRequest);
     var response = restTemplate.postForEntity(authenticationBaseUrl + "/token", request, AuthenticationResponse.class);
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    headers.add("Authorization", "Bearer " + response.getBody().getJwt());
+    headers.add("Authorization", "Bearer " + response.getBody().getAccessToken());
   }
 
   @AfterEach
@@ -89,23 +91,17 @@ class RESTMessageControllerTest {
   }
 
   @Test
-  void shouldGetEmptyListWhenNoMessages() {
-    headers.clear(); //no authentication required
-    var messageDtoCollection = getAllMessages().getBody();
-
-    assertThat(messageDtoCollection.getMessages()).isEmpty();
-  }
-
-  @Test
   void shouldGetMessageAfterCreating() {
     var messageToCreate = new NewMessage("this is a message");
     postMessage(messageToCreate);
 
-    var messageDtoCollection = getAllMessages().getBody();
+    var messages = getAllMessages().getBody().getMessages();
+    var lastMessage = messages.get(messages.size() - 1);
 
-    assertThat(messageDtoCollection.getMessages()).hasSize(1);
-    var firstMessage = messageDtoCollection.getMessages().stream().findFirst().orElseThrow();
-    assertThat(firstMessage.getText()).isEqualTo(messageToCreate.getText());
+    assertThat(lastMessage.getText()).isEqualTo(messageToCreate.getText());
+    assertThat(Integer.parseInt(lastMessage.getId())).isGreaterThan(0);
+    assertThat(OffsetDateTime.parse(lastMessage.getCreatedAt())).isNotNull();
+    assertThat(lastMessage.getAuthor()).isEqualTo("Bob");
   }
 
   @Test
@@ -115,7 +111,11 @@ class RESTMessageControllerTest {
 
     deleteMessage(createdMessage.getBody().getId());
 
-    assertThat(getAllMessages().getBody().getMessages()).isEmpty();
+    assertThat(getAllMessages().getBody().getMessages()
+        .stream()
+        .filter(m -> m.getText().equals(message.getText()))
+        .collect(Collectors.toSet()))
+        .isEmpty();
   }
 
   @Test
@@ -127,7 +127,9 @@ class RESTMessageControllerTest {
 
     updateMessage(createdMessage.getBody().getId(), updatedMessage);
 
-    assertThat(getAllMessages().getBody().getMessages().get(0).getText()).isEqualTo(updatedMessage.getText());
+    var messages = getAllMessages().getBody().getMessages();
+    var lastMessage = messages.get(messages.size() - 1);
+    assertThat(lastMessage.getText()).isEqualTo(updatedMessage.getText());
   }
 
   @Test
@@ -265,8 +267,8 @@ class RESTMessageControllerTest {
   }
 
   @Test
-  void shouldNotAllowMessageTextWithLessThan3Characters() {
-    var message = new NewMessage("m");
+  void shouldNotAllowMessageTextWithLessThan1Characters() {
+    var message = new NewMessage("");
 
     var response = postMessage(message);
 

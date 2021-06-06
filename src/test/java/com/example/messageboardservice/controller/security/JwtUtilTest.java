@@ -2,10 +2,8 @@ package com.example.messageboardservice.controller.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.core.userdetails.User;
 
 class JwtUtilTest {
 
@@ -19,25 +17,22 @@ class JwtUtilTest {
 
   @Test
   void shouldGenerateNonEmptyToken() {
-    var user = new User("username", "password", List.of());
-    var token = jwtUtil.generateToken(user);
+    var token = jwtUtil.generateAccessToken("username");
 
     assertThat(token).isNotEmpty();
   }
 
   @Test
-  void shouldGenerateValidtoken() {
-    var user = new User("username", "password", List.of());
-    var token = jwtUtil.generateToken(user);
+  void shouldGenerateValidToken() {
+    var token = jwtUtil.generateAccessToken("username");
 
-    assertThat(jwtUtil.validate(token)).isTrue();
+    assertThat(jwtUtil.validateAccessToken(token)).isTrue();
   }
 
   @Test
   void shouldParseUsernameFromToken() {
     var username = "username";
-    var user = new User(username, "password", List.of());
-    var token = jwtUtil.generateToken(user);
+    var token = jwtUtil.generateAccessToken(username);
 
     assertThat(jwtUtil.extractUsername(token)).isEqualTo(username);
   }

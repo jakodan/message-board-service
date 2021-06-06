@@ -17,9 +17,13 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+@EnableWebMvc
+public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 
   private static final int BCRYPT_STRENGTH = 10;
   private final UserService userService;
@@ -38,8 +42,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
+
     http.cors().and().csrf().disable()
         .authorizeRequests()
+        .antMatchers("/auth/refresh").permitAll()
         .antMatchers(HttpMethod.POST, "/auth/token").permitAll()
         .antMatchers(HttpMethod.GET, "/messages").permitAll()
         .anyRequest().authenticated()
@@ -74,4 +80,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     return super.authenticationManagerBean();
   }
 
+  @Override
+  public void addCorsMappings(CorsRegistry registry) {
+    registry.addMapping("/**")
+        .allowedOrigins("http://localhost:3000")
+        .allowedMethods("GET", "POST", "DELETE")
+        .allowCredentials(true);
+  }
 }

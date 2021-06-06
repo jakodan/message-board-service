@@ -6,6 +6,6 @@ import lombok.Value;
 @Value
 public class UpdatedMessage {
 
-  @Size(min = 3, max = 250)
+  @Size(min = 1, max = 250)
   String text;
 }

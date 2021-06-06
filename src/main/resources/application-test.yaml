@@ -5,3 +5,18 @@ test-users:
   password: Bob
 - username: Alice
   password: Alice
+test-messages:
+- text: "Hey my name is Bob, what's up?"
+  author: "Bob"
+- text: "This is a test message"
+  author: "Alice"
+- text: "Beep bop"
+  author: "Alice"
+- text: "Stuff and things"
+  author: "Bob"
+- text: "Meep meep Im a jeep"
+  author: "Bob"
+- text: "Hamburger lol"
+  author: "Alice"
+- text: "Hurr durr colonize Mars"
+  author: "Elon Musk"

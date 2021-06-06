@@ -8,6 +8,8 @@ import static org.mockito.Mockito.when;
 import com.example.messageboardservice.repository.MessageRepository;
 import com.example.messageboardservice.service.model.Message;
 import com.example.messageboardservice.service.util.MessageIdCreator;
+import com.example.messageboardservice.service.util.TimestampCreator;
+import java.time.OffsetDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,11 +18,13 @@ class MessageServiceTest {
 
   private MessageService messageService;
   private MessageRepository messageRepository;
+  private TimestampCreator timestampCreator;
 
   @BeforeEach
   void setUp() {
     messageRepository = mock(MessageRepository.class);
-    messageService = new MessageService(messageRepository);
+    timestampCreator = mock(TimestampCreator.class);
+    messageService = new MessageService(messageRepository, timestampCreator);
   }
 
   @Test
@@ -32,7 +36,9 @@ class MessageServiceTest {
 
     var expectedMessageId = MessageIdCreator.createFrom(messageText, author);
 
-    assertThat(createdMessage).isEqualTo(new Message(messageText, expectedMessageId, author));
+    assertThat(createdMessage).usingRecursiveComparison()
+        .ignoringFields("createdAt")
+        .isEqualTo(new Message(messageText, expectedMessageId, author, null));
   }
 
   @Test
@@ -40,8 +46,9 @@ class MessageServiceTest {
     var messageText = "this is a message";
     var author = "test-user";
     var messageId = MessageIdCreator.createFrom(messageText, author);
-
-    var message = new Message(messageText, messageId, author);
+    var timestamp = OffsetDateTime.now();
+    when(timestampCreator.now()).thenReturn(timestamp);
+    var message = new Message(messageText, messageId, author, timestamp);
 
     messageService.createMessage(message.getText(), author);
 
@@ -50,7 +57,9 @@ class MessageServiceTest {
 
   @Test
   void shouldGetAllMessages() {
-    var message = new Message("this is a message", "message-id", "author");
+    var timestamp = OffsetDateTime.now();
+    when(timestampCreator.now()).thenReturn(timestamp);
+    var message = new Message("this is a message", "message-id", "author", timestamp);
     when(messageRepository.getAll()).thenReturn(List.of(message));
 
     var messages = messageService.getAllMessages();

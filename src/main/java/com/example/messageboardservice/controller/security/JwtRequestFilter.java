@@ -35,7 +35,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     var jwt = authorizationHeader.split(" ")[1].trim();
 
-    if (!jwtUtil.validate(jwt)) {
+    if (!jwtUtil.validateAccessToken(jwt)) {
       filterChain.doFilter(request, response);
       return;
     }
