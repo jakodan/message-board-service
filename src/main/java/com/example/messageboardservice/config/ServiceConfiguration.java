@@ -3,6 +3,7 @@ package com.example.messageboardservice.config;
 import com.example.messageboardservice.repository.MessageRepository;
 import com.example.messageboardservice.service.MessageService;
 import com.example.messageboardservice.service.UserService;
+import com.example.messageboardservice.service.util.MessageIdCreator;
 import com.example.messageboardservice.service.util.TimestampCreator;
 import java.util.HashMap;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,8 +15,9 @@ import org.springframework.security.core.userdetails.User;
 public class ServiceConfiguration {
 
   @Bean
-  public MessageService messageService(MessageRepository messageRepository, TimestampCreator timestampCreator) {
-    return new MessageService(messageRepository, timestampCreator);
+  public MessageService messageService(MessageRepository messageRepository, TimestampCreator timestampCreator,
+      MessageIdCreator messageIdCreator) {
+    return new MessageService(messageRepository, timestampCreator, messageIdCreator);
   }
 
   @Bean
@@ -27,5 +29,10 @@ public class ServiceConfiguration {
   @Bean
   public TimestampCreator timestampCreator(@Value("${timezone}") String timezone) {
     return new TimestampCreator(timezone);
+  }
+
+  @Bean
+  public MessageIdCreator messageIdCreator() {
+    return new MessageIdCreator();
   }
 }

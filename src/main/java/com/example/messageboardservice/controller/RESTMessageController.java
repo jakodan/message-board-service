@@ -2,7 +2,7 @@ package com.example.messageboardservice.controller;
 
 import com.example.messageboardservice.controller.dto.MessageDto;
 import com.example.messageboardservice.controller.dto.MessageDtoCollection;
-import com.example.messageboardservice.controller.dto.NewMessage;
+import com.example.messageboardservice.controller.dto.NewMessageDto;
 import com.example.messageboardservice.controller.dto.UpdatedMessage;
 import com.example.messageboardservice.controller.util.MessageURICreator;
 import com.example.messageboardservice.service.MessageService;
@@ -50,11 +50,11 @@ public class RESTMessageController {
   }
 
   @PostMapping
-  public ResponseEntity<MessageDto> postMessage(@Validated @RequestBody NewMessage newMessage,
+  public ResponseEntity<MessageDto> postMessage(@Validated @RequestBody NewMessageDto newMessageDto,
       @CurrentSecurityContext SecurityContext securityContext) {
     var username = getUsername(securityContext);
 
-    var message = messageService.createMessage(newMessage.getText(), username);
+    var message = messageService.createMessage(newMessageDto.getText(), username, newMessageDto.getRequestKey());
     var messageUri = messageURICreator.create(message.getId());
 
     var responseBody = MessageDto.createFrom(message);

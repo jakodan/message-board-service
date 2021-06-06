@@ -11,6 +11,7 @@ import com.example.messageboardservice.service.util.MessageIdCreator;
 import com.example.messageboardservice.service.util.TimestampCreator;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,38 +20,46 @@ class MessageServiceTest {
   private MessageService messageService;
   private MessageRepository messageRepository;
   private TimestampCreator timestampCreator;
+  private MessageIdCreator messageIdCreator;
 
   @BeforeEach
   void setUp() {
     messageRepository = mock(MessageRepository.class);
     timestampCreator = mock(TimestampCreator.class);
-    messageService = new MessageService(messageRepository, timestampCreator);
+    messageIdCreator = mock(MessageIdCreator.class);
+
+    messageService = new MessageService(messageRepository, timestampCreator, messageIdCreator);
   }
 
   @Test
   void shouldReturnMessage_whenCreatingMessage() {
     var messageText = "this is a message";
     var author = "test-user";
+    var requestKey = UUID.randomUUID();
+    var createdAt = OffsetDateTime.now();
+    var messageId = "123";
 
-    var createdMessage = messageService.createMessage(messageText, author);
+    when(timestampCreator.now()).thenReturn(createdAt);
+    when(messageIdCreator.createFrom(messageText, author, requestKey.toString())).thenReturn(messageId);
 
-    var expectedMessageId = MessageIdCreator.createFrom(messageText, author);
+    var createdMessage = messageService.createMessage(messageText, author, requestKey);
 
-    assertThat(createdMessage).usingRecursiveComparison()
-        .ignoringFields("createdAt")
-        .isEqualTo(new Message(messageText, expectedMessageId, author, null));
+    assertThat(createdMessage).isEqualTo(new Message(messageText, messageId, author, createdAt));
   }
 
   @Test
   void shouldSaveMessageToRepository() {
     var messageText = "this is a message";
     var author = "test-user";
-    var messageId = MessageIdCreator.createFrom(messageText, author);
+    var requestKey = UUID.randomUUID();
+    var messageId = "123";
+    when(messageIdCreator.createFrom(messageText, author, requestKey.toString())).thenReturn(messageId);
+
     var timestamp = OffsetDateTime.now();
     when(timestampCreator.now()).thenReturn(timestamp);
     var message = new Message(messageText, messageId, author, timestamp);
 
-    messageService.createMessage(message.getText(), author);
+    messageService.createMessage(message.getText(), author, requestKey);
 
     verify(messageRepository).save(message);
   }

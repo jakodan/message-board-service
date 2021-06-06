@@ -38,15 +38,4 @@ class UserServiceTest {
     assertThatThrownBy(() -> userService.loadUserByUsername(invalidUsername))
         .isInstanceOf(UsernameNotFoundException.class);
   }
-
-  @Test
-  void shouldAssert() {
-    for (int i = 0; i++ < 10; i++) {
-      System.out.println(i);
-    }
-    boolean b = false;
-    if ((b = true) && true) {
-
-    }
-  }
 }

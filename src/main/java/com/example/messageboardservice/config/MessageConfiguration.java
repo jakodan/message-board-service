@@ -1,6 +1,7 @@
 package com.example.messageboardservice.config;
 
 import com.example.messageboardservice.service.MessageService;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +23,7 @@ public class MessageConfiguration {
 
     if (messageConfigurationProperties.getTestMessages() != null) {
       messageConfigurationProperties.getTestMessages()
-          .forEach(messageConfig -> messageService.createMessage(messageConfig.text, messageConfig.author));
+          .forEach(messageConfig -> messageService.createMessage(messageConfig.text, messageConfig.author, UUID.randomUUID()));
     }
   }
 }

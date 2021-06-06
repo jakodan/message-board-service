@@ -6,11 +6,12 @@ import com.example.messageboardservice.controller.dto.AuthenticationRequest;
 import com.example.messageboardservice.controller.dto.AuthenticationResponse;
 import com.example.messageboardservice.controller.dto.MessageDto;
 import com.example.messageboardservice.controller.dto.MessageDtoCollection;
-import com.example.messageboardservice.controller.dto.NewMessage;
+import com.example.messageboardservice.controller.dto.NewMessageDto;
 import com.example.messageboardservice.controller.dto.UpdatedMessage;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -52,6 +53,7 @@ class RESTMessageControllerTest {
     messagesBaseUrl = "http://localhost:" + port + "/messages";
     authenticationBaseUrl = "http://localhost:" + port + "/auth";
     setupAuthentication("Bob", "Bob");
+    headers.add("Content-Type", "application/json");
   }
 
   private void setupAuthentication(String username, String password) {
@@ -72,7 +74,7 @@ class RESTMessageControllerTest {
 
   @Test
   void postMessageShouldReturnCreatedStatus() {
-    var message = new NewMessage("this is a message");
+    var message = new NewMessageDto("this is a message", UUID.randomUUID());
 
     var response = postMessage(message);
 
@@ -81,7 +83,7 @@ class RESTMessageControllerTest {
 
   @Test
   void postMessageShouldReturnLocationHeader() {
-    var message = new NewMessage("this is a message");
+    var message = new NewMessageDto("this is a message", UUID.randomUUID());
 
     var response = postMessage(message);
 
@@ -92,7 +94,7 @@ class RESTMessageControllerTest {
 
   @Test
   void shouldGetMessageAfterCreating() {
-    var messageToCreate = new NewMessage("this is a message");
+    var messageToCreate = new NewMessageDto("this is a message", UUID.randomUUID());
     postMessage(messageToCreate);
 
     var messages = getAllMessages().getBody().getMessages();
@@ -106,7 +108,7 @@ class RESTMessageControllerTest {
 
   @Test
   void shouldDeleteMessage() {
-    var message = new NewMessage("this is a message");
+    var message = new NewMessageDto("this is a message", UUID.randomUUID());
     var createdMessage = postMessage(message);
 
     deleteMessage(createdMessage.getBody().getId());
@@ -120,7 +122,7 @@ class RESTMessageControllerTest {
 
   @Test
   void shouldUpdateMessage() {
-    var newMessage = new NewMessage("this is a message");
+    var newMessage = new NewMessageDto("this is a message", UUID.randomUUID());
     var createdMessage = postMessage(newMessage);
 
     var updatedMessage = new UpdatedMessage(createdMessage.getBody().getText() + " updated");
@@ -153,7 +155,7 @@ class RESTMessageControllerTest {
   @Test
   void shouldReturn401_whenUserNotResourceOwner_whenDeleting() {
     setupAuthentication("Bob", "Bob");
-    var message = new NewMessage("new message");
+    var message = new NewMessageDto("new message", UUID.randomUUID());
     var createdMessage = postMessage(message);
     setupAuthentication("Alice", "Alice");
     var response = deleteMessage(createdMessage.getBody().getId());
@@ -165,7 +167,7 @@ class RESTMessageControllerTest {
   @Test
   void shouldReturn401_whenUserNotResourceOwner_whenUpdating() {
     setupAuthentication("Bob", "Bob");
-    var message = new NewMessage("new message");
+    var message = new NewMessageDto("new message", UUID.randomUUID());
     var createdMessage = postMessage(message);
     setupAuthentication("Alice", "Alice");
     var response = updateMessage(createdMessage.getBody().getId(), new UpdatedMessage("updatedMessage"));
@@ -177,7 +179,7 @@ class RESTMessageControllerTest {
   @Test
   void shouldAllowDeletion_afterReAuthentication() {
     setupAuthentication("Bob", "Bob");
-    var message = new NewMessage("new message");
+    var message = new NewMessageDto("new message", UUID.randomUUID());
     var createdMessage = postMessage(message);
     setupAuthentication("Bob", "Bob"); //setup authentication again, will generate new jwt
 
@@ -189,7 +191,7 @@ class RESTMessageControllerTest {
   @Test
   void shouldAllowUpdate_afterReAuthentication() {
     setupAuthentication("Bob", "Bob");
-    var message = new NewMessage("new message");
+    var message = new NewMessageDto("new message", UUID.randomUUID());
     var createdMessage = postMessage(message);
     setupAuthentication("Bob", "Bob"); //setup authentication again, will generate new jwt
 
@@ -202,7 +204,7 @@ class RESTMessageControllerTest {
   void shouldReturnUnauthorized_whenNoAuthorizationHeader_whenPosting() {
     headers.clear();
 
-    var message = new NewMessage("new message");
+    var message = new NewMessageDto("new message", UUID.randomUUID());
     var response = postMessage(message);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
@@ -231,7 +233,7 @@ class RESTMessageControllerTest {
     headers.clear();
     headers.add("Authorization", "invalid");
 
-    var response = postMessage(new NewMessage("text"));
+    var response = postMessage(new NewMessageDto("text", UUID.randomUUID()));
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
   }
@@ -268,7 +270,7 @@ class RESTMessageControllerTest {
 
   @Test
   void shouldNotAllowMessageTextWithLessThan1Characters() {
-    var message = new NewMessage("");
+    var message = new NewMessageDto("", UUID.randomUUID());
 
     var response = postMessage(message);
 
@@ -278,19 +280,39 @@ class RESTMessageControllerTest {
   @Test
   void shouldNotAllowMessageTextWithMoreThan250Characters() {
     var text = StringUtils.repeat("m", 251);
-    var message = new NewMessage(text);
+    var message = new NewMessageDto(text, UUID.randomUUID());
 
     var response = postMessage(message);
 
     assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
   }
 
+  @Test
+  void shouldReturnBadRequest_whenNullRequestId() {
+    var body = "{\"text\":\"Hej\"}";
+
+    var request = new HttpEntity<>(body, headers);
+    var response = restTemplate.postForEntity(messagesBaseUrl, request, String.class);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+  }
+
+  @Test
+  void shouldRequireRequestKeyToBeUuid() {
+    var body = "{\"text\":\"Hej\", \"requestKey\":\"not-a-uuid\"}";
+
+    var request = new HttpEntity<>(body, headers);
+    var response = restTemplate.postForEntity(messagesBaseUrl, request, String.class);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+  }
+
   private ResponseEntity<MessageDtoCollection> getAllMessages() {
     return restTemplate.getForEntity(messagesBaseUrl, MessageDtoCollection.class);
   }
 
-  private ResponseEntity<MessageDto> postMessage(NewMessage newMessage) {
-    var request = new HttpEntity<>(newMessage, headers);
+  private ResponseEntity<MessageDto> postMessage(NewMessageDto newMessageDto) {
+    var request = new HttpEntity<>(newMessageDto, headers);
     var response = restTemplate.postForEntity(messagesBaseUrl, request, MessageDto.class);
 
     if (response.getBody() != null) {
