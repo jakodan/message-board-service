@@ -2,7 +2,6 @@ package com.example.messageboardservice.config;
 
 import com.example.messageboardservice.controller.security.JwtRequestFilter;
 import com.example.messageboardservice.controller.security.JwtUtil;
-import com.example.messageboardservice.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,8 +10,8 @@ import org.springframework.context.annotation.Configuration;
 public class JwtConfiguration {
 
   @Bean
-  JwtRequestFilter jwtRequestFilter(UserService userService, JwtUtil jwtUtil) {
-    return new JwtRequestFilter(userService, jwtUtil);
+  JwtRequestFilter jwtRequestFilter(JwtUtil jwtUtil) {
+    return new JwtRequestFilter(jwtUtil);
   }
 
   @Bean

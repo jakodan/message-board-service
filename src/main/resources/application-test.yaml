@@ -18,5 +18,7 @@ test-messages:
   author: "Bob"
 - text: "Hamburger lol"
   author: "Alice"
-- text: "Hurr durr colonize Mars"
+- text: "lmao Colonize mars"
+  author: "Elon Musk"
+- text: "dogecoin is great"
   author: "Elon Musk"

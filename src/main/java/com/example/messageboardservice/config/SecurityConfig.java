@@ -1,12 +1,10 @@
 package com.example.messageboardservice.config;
 
 import com.example.messageboardservice.controller.security.JwtRequestFilter;
-import com.example.messageboardservice.service.UserService;
-import java.security.SecureRandom;
+import com.example.messageboardservice.user.service.UserService;
 import javax.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -14,8 +12,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -25,7 +21,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableWebMvc
 public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 
-  private static final int BCRYPT_STRENGTH = 10;
   private final UserService userService;
   private final JwtRequestFilter jwtRequestFilter;
 
@@ -48,6 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
         .antMatchers("/auth/refresh").permitAll()
         .antMatchers(HttpMethod.POST, "/auth/token").permitAll()
         .antMatchers(HttpMethod.GET, "/messages").permitAll()
+        .antMatchers(HttpMethod.POST, "/user").permitAll()
         .anyRequest().authenticated()
         .and().sessionManagement()
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -65,12 +61,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
         .and();
 
     http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-  }
-
-  @Bean
-  @Primary
-  public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder(BCRYPT_STRENGTH, new SecureRandom());
   }
 
   @Bean(name = "myAuthenticationManager")
